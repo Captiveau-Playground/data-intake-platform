@@ -28,7 +28,7 @@ services:
     environment:
       DATABASE_URL: postgresql://football_intel:football_intel_dev@postgres:5432/football_intel
       SECRET_KEY: dev-secret-key-change-in-production
-      CORS_ORIGINS: http://web:3000,http://localhost:3000
+      CORS_ORIGINS: http://203.175.11.26:3000,http://localhost:3000
     depends_on:
       postgres:
         condition: service_healthy
