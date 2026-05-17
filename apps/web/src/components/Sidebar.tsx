@@ -18,10 +18,15 @@ export default function Sidebar() {
     fetchDashboardStats(token).then(setStats).catch(() => router.push("/login"));
   }, [router]);
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    router.push("/login");
+  };
+
   return (
     <aside className="sidebar">
       <h1 style={{ fontSize: "20px", marginBottom: "32px", fontWeight: "700" }}>
-        Football Intel
+        ⚽ Football Intel
       </h1>
       <nav style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
         <Link href="/" className="btn" style={{ justifyContent: "flex-start" }}>
@@ -39,6 +44,9 @@ export default function Sidebar() {
         <Link href="/jobs" className="btn" style={{ justifyContent: "flex-start" }}>
           Jobs
         </Link>
+        <button onClick={handleLogout} className="btn" style={{ justifyContent: "flex-start", color: "var(--danger)", marginTop: "16px" }}>
+          Log Out
+        </button>
       </nav>
       {stats && (
         <div style={{ marginTop: "auto", paddingTop: "24px", borderTop: "1px solid var(--border)" }}>
