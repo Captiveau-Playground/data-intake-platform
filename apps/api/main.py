@@ -234,21 +234,15 @@ async def upload_files(
         # Process CSV immediately
         try:
             print(f"Processing file: {filepath}")
-            # CSV uses semicolon delimiter
-            df = pd.read_csv(filepath, encoding="utf-8", sep=";", on_bad_lines="skip", quotechar='"', engine="python")
+            # Gunakan sep=None agar pandas otomatis mendeteksi apakah file menggunakan koma (,) atau titik koma (;)
+            df = pd.read_csv(filepath, encoding="utf-8", sep=None, on_bad_lines="skip", quotechar='"', engine="python")
             print(f"Loaded {len(df)} rows, columns: {df.columns.tolist()}")
             
-            # Normalize column names - strip quotes
-            df.columns = df.columns.str.strip().str.replace('"', '').str.strip()
+            # Normalize column names - strip quotes and make lowercase for easier matching
+            df.columns = df.columns.str.strip().str.replace('"', '').str.strip().str.lower()
             print(f"Normalized columns: {df.columns.tolist()}")
             
-            # Fill empty text
-            if "text" in df.columns:
-                df["text"] = df["text"].fillna("").astype(str).str.strip()
-                df = df[df["text"].str.len() > 0]
-                print(f"After filtering empty text: {len(df)} rows")
-            else:
-                print("Column 'text' not found!")
+            import uuid
             
             def safe_val(v):
                 if pd.isna(v):
@@ -259,16 +253,26 @@ async def upload_files(
             
             # Prepare data first, skip invalid
             valid_rows = []
-            for _, row in df.iterrows():
+            for idx, row in df.iterrows():
                 try:
-                    comment_id = safe_val(row.get("comment_id"))
-                    if comment_id and comment_id != "None":
-                        valid_rows.append((
-                            post_id, comment_id, safe_val(row.get("text")), 
-                            safe_val(row.get("username")), safe_val(row.get("user_id")), 
-                            safe_val(row.get("profile_pic_url")), None  # Skip created_at - invalid format
-                        ))
-                except Exception:
+                    # Cari kolom teks komentar dengan berbagai variasi nama kolom
+                    text = safe_val(row.get("komentar")) or safe_val(row.get("text")) or safe_val(row.get("comment")) or safe_val(row.get("content")) or safe_val(row.get("message"))
+                    if not text:
+                        continue
+                        
+                    # Generate unique ID (cari dari comment_id, no, id, atau bikin UUID baru)
+                    comment_id = safe_val(row.get("comment_id")) or safe_val(row.get("no")) or safe_val(row.get("id")) or str(uuid.uuid4())
+                    
+                    # Cari username
+                    username = safe_val(row.get("nama pengguna")) or safe_val(row.get("username")) or safe_val(row.get("user")) or safe_val(row.get("name"))
+                    
+                    valid_rows.append((
+                        post_id, comment_id, text, 
+                        username, safe_val(row.get("user_id")), 
+                        safe_val(row.get("profile_pic_url")), None
+                    ))
+                except Exception as e:
+                    print(f"Row error: {e}")
                     total_failed += 1
             
             # Batch insert

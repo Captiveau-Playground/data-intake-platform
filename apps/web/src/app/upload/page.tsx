@@ -74,7 +74,7 @@ export default function UploadPage() {
             <input
               ref={fileInputRef}
               type="file"
-              accept=".csv"
+              accept=".csv, .xls, .xlsx, application/vnd.ms-excel, text/csv"
               multiple
               onChange={handleFileChange}
               className="input"

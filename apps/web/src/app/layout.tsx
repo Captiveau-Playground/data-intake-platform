@@ -1,4 +1,4 @@
-import Sidebar from "@/components/Sidebar";
+import MainLayout from "@/components/MainLayout";
 import "./globals.css";
 
 export const metadata = {
@@ -14,8 +14,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <Sidebar />
-        <main className="main-content">{children}</main>
+        <MainLayout>{children}</MainLayout>
       </body>
     </html>
   );
