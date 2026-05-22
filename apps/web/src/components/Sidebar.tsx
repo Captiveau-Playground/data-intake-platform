@@ -83,7 +83,7 @@ function SidebarContent({
   }, {});
 
   return (
-    <div className="flex h-full flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground">
+    <div className="flex h-full flex-col border-r border-border bg-card text-card-foreground">
       {/* Header */}
       <div className="flex items-center gap-3 px-4 py-4">
         <div className="flex h-8 w-8 items-center justify-center rounded-md overflow-hidden shrink-0">
@@ -111,8 +111,8 @@ function SidebarContent({
                       className={cn(
                         "flex items-center gap-3 rounded-md px-2 py-1.5 text-sm transition-colors",
                         isActive
-                          ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
-                          : "text-muted-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
+                          ? "bg-accent text-accent-foreground font-medium"
+                          : "text-muted-foreground hover:bg-accent/50 hover:text-accent-foreground"
                       )}
                     >
                       <item.icon className="h-4 w-4 shrink-0" />
@@ -127,7 +127,7 @@ function SidebarContent({
       </div>
 
       {/* Footer — user with dropdown */}
-      <div className="relative border-t border-sidebar-border p-2" ref={dropdownRef}>
+      <div className="relative border-t border-border p-2" ref={dropdownRef}>
         {/* Dropdown popup */}
         {dropdownOpen && (
           <div className="absolute bottom-full left-1 right-1 mb-1 rounded-lg border border-border bg-popover text-popover-foreground shadow-xl z-50 overflow-hidden">
@@ -164,7 +164,7 @@ function SidebarContent({
         {/* User trigger button */}
         <button
           onClick={() => setDropdownOpen(!dropdownOpen)}
-          className="flex w-full items-center gap-3 rounded-md px-2 py-2 hover:bg-sidebar-accent transition-colors"
+          className="flex w-full items-center gap-3 rounded-md px-2 py-2 hover:bg-accent transition-colors"
         >
           <div className="flex h-7 w-7 items-center justify-center rounded-md bg-muted text-muted-foreground text-xs font-bold shrink-0">
             {username?.charAt(0).toUpperCase() || "U"}
