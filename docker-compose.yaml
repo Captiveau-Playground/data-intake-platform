@@ -2,18 +2,20 @@ services:
   postgres:
     image: postgres:15-alpine
     environment:
-      POSTGRES_USER: football_intel
-      POSTGRES_PASSWORD: football_intel_dev
-      POSTGRES_DB: football_intel
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./infra/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U football_intel"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
       interval: 5s
       timeout: 5s
       retries: 5
+    restart: unless-stopped
     networks:
       - football-net
 
@@ -24,14 +26,15 @@ services:
     ports:
       - "3001:3001"
     environment:
-      DATABASE_URL: postgresql://football_intel:football_intel_dev@postgres:5432/football_intel
-      SECRET_KEY: dev-secret-key-change-in-production
-      CORS_ORIGINS: http://43.157.247.204:3000,http://localhost:3000
+      DATABASE_URL: ${DATABASE_URL}
+      SECRET_KEY: ${SECRET_KEY}
+      CORS_ORIGINS: ${CORS_ORIGINS}
     depends_on:
       postgres:
         condition: service_healthy
     volumes:
       - api_uploads:/app/uploads
+    restart: unless-stopped
     networks:
       - football-net
 
@@ -40,13 +43,14 @@ services:
       context: .
       dockerfile: apps/web/Dockerfile
       args:
-        - NEXT_PUBLIC_API_URL=http://43.157.247.204:3001
+        - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
     ports:
       - "3000:3000"
     environment:
-      NEXT_PUBLIC_API_URL: http://43.157.247.204:3001
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
     depends_on:
       - api
+    restart: unless-stopped
     networks:
       - football-net
 

@@ -1,48 +1,94 @@
+# ========================
 # Dependencies
+# ========================
 node_modules/
 .venv/
+venv/
+env/
 __pycache__/
 *.py[cod]
 *$py.class
+*.egg-info/
+.pnp/
+.pnp.js
 
-# Build
+# ========================
+# Build Output
+# ========================
 .next/
+out/
 dist/
 build/
-*.egg-info/
+.turbo/
+*.tsbuildinfo
 
-# Docker
-.dockerignore
-
-# Environment
+# ========================
+# Environment Variables
+# ========================
 .env
 .env.local
 .env.*.local
+.env.development
 .env.production
 
-# IDE
+# ========================
+# Docker
+# ========================
+.dockerignore
+
+# ========================
+# IDE / Editor
+# ========================
 .idea/
 .vscode/
+.kiro/
 *.swp
 *.swo
+*.sublime-project
+*.sublime-workspace
 
-# OS
+# ========================
+# OS Files
+# ========================
 .DS_Store
+.DS_Store?
 Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
 
+# ========================
 # Logs
+# ========================
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
 
-# Testing
+# ========================
+# Testing / Coverage
+# ========================
 coverage/
+.nyc_output/
+*.lcov
 
-# Local
+# ========================
+# Local / Uploads
+# ========================
 uploads/
 *.csv
+*.xls
+*.xlsx
 
-# Turborepo
-.turbo/
+# ========================
+# Lock files (pnpm)
+# ========================
 pnpm-lock.yaml
+
+# ========================
+# Misc
+# ========================
+*.tgz
+*.patch
+.cache/

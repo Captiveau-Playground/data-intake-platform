@@ -1,75 +1,82 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useAuth } from "@/hooks/useAuth";
 import { fetchDashboardStats } from "@/lib/api";
+import { MessageSquare, FileText, Upload, Copy } from "lucide-react";
+import { StatCard } from "@/components/dashboard/StatCard";
+import { LatestJobCard } from "@/components/dashboard/LatestJobCard";
+import { PlatformInfoCard } from "@/components/dashboard/PlatformInfoCard";
+import type { DashboardStats } from "@/types";
 
 export default function DashboardPage() {
-  const router = useRouter();
-  const [stats, setStats] = useState<any>(null);
+  const { token, username, role, isLoading } = useAuth();
+  const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      router.push("/login");
-      return;
-    }
-
+    if (!token) return;
     fetchDashboardStats(token)
       .then(setStats)
-      .catch(() => router.push("/login"))
       .finally(() => setLoading(false));
-  }, [router]);
+  }, [token]);
 
-  if (loading) return <div>Loading...</div>;
-
-  return (
-    <div className="container">
-      <h1 style={{ fontSize: "28px", fontWeight: "700", marginBottom: "24px" }}>Dashboard</h1>
-
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "24px", marginBottom: "32px" }}>
-        <div className="card stat-card">
-          <span className="stat-label">Total Comments</span>
-          <span className="stat-value">{stats?.total_comments?.toLocaleString() || 0}</span>
-        </div>
-        <div className="card stat-card">
-          <span className="stat-label">Total Posts</span>
-          <span className="stat-value">{stats?.total_posts?.toLocaleString() || 0}</span>
-        </div>
-        <div className="card stat-card">
-          <span className="stat-label">Total Uploads</span>
-          <span className="stat-value">{stats?.total_uploads?.toLocaleString() || 0}</span>
-        </div>
-        <div className="card stat-card">
-          <span className="stat-label">Duplicates Skipped</span>
-          <span className="stat-value">{stats?.total_duplicates?.toLocaleString() || 0}</span>
+  if (isLoading || loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="flex flex-col items-center gap-2">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+          <p className="text-sm text-muted-foreground">Loading dashboard...</p>
         </div>
       </div>
+    );
+  }
 
-      {stats?.latest_job && (
-        <div className="card">
-          <h2 style={{ fontSize: "18px", fontWeight: "600", marginBottom: "16px" }}>Latest Upload</h2>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "16px" }}>
-            <div>
-              <p style={{ fontSize: "12px", color: "var(--text-secondary)" }}>Status</p>
-              <span className={`badge badge-${stats.latest_job.status === "completed" ? "success" : "warning"}`}>
-                {stats.latest_job.status}
-              </span>
-            </div>
-            <div>
-              <p style={{ fontSize: "12px", color: "var(--text-secondary)" }}>Rows Inserted</p>
-              <p style={{ fontSize: "16px", fontWeight: "500" }}>{stats.latest_job.inserted_rows}</p>
-            </div>
-            <div>
-              <p style={{ fontSize: "12px", color: "var(--text-secondary)" }}>Created At</p>
-              <p style={{ fontSize: "16px", fontWeight: "500" }}>
-                {new Date(stats.latest_job.created_at).toLocaleString()}
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
+  return (
+    <div className="space-y-6">
+      {/* Page header */}
+      <div className="flex flex-col gap-1">
+        <h1 className="text-2xl font-bold tracking-tight md:text-3xl">
+          Dashboard
+        </h1>
+        <p className="text-muted-foreground">
+          Welcome back, <span className="capitalize font-medium text-foreground">{username}</span>. Here&apos;s your platform overview.
+        </p>
+      </div>
+
+      {/* Stat cards */}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <StatCard
+          title="Total Comments"
+          value={stats?.total_comments ?? 0}
+          description="Scraped from Instagram posts"
+          icon={MessageSquare}
+        />
+        <StatCard
+          title="Total Posts"
+          value={stats?.total_posts ?? 0}
+          description="Tracked Instagram posts"
+          icon={FileText}
+        />
+        <StatCard
+          title="Total Uploads"
+          value={stats?.total_uploads ?? 0}
+          description="Ingestion jobs processed"
+          icon={Upload}
+        />
+        <StatCard
+          title="Duplicates Skipped"
+          value={stats?.total_duplicates ?? 0}
+          description="Already existing comments"
+          icon={Copy}
+        />
+      </div>
+
+      {/* Bottom section */}
+      <div className="grid gap-4 lg:grid-cols-7">
+        <LatestJobCard job={stats?.latest_job ?? null} />
+        <PlatformInfoCard role={role} />
+      </div>
     </div>
   );
 }
